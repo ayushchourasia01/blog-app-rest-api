@@ -54,4 +54,10 @@ public class PostServiceImpl implements PostService {
         repo.save(post);
         return mapper.convertValue(post, PostDTO.class);
     }
+
+    @Override
+    public void deleteById(Long postId) {
+        Post post = repo.findById(postId).orElseThrow(() -> new ResourceNotFoundException("Post","id",postId));
+        repo.delete(post);
+    }
 }
