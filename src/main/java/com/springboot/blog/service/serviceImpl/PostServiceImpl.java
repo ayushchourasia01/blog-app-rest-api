@@ -2,14 +2,19 @@ package com.springboot.blog.service.serviceImpl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.springboot.blog.dto.PostDTO;
+import com.springboot.blog.dto.PostResponse;
 import com.springboot.blog.exception.ResourceNotFoundException;
 import com.springboot.blog.model.Post;
 import com.springboot.blog.repository.PostRepository;
 import com.springboot.blog.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.awt.print.Pageable;
 import java.lang.module.ResolutionException;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -27,10 +32,22 @@ public class PostServiceImpl implements PostService {
         return mapper.convertValue(res,PostDTO.class);
     }
     @Override
-    public List<PostDTO> getAllPosts(){
-        List<Post> posts = repo.findAll();
-        return posts.stream().map(post -> mapper.convertValue(post, PostDTO.class))
+    public PostResponse getAllPosts(int pageNo, int pageSize, String sortBy, String sortDir){
+        Sort sort = sortDir.equalsIgnoreCase(Sort.Direction.ASC.name()) ? Sort.by(sortBy).ascending()
+                : Sort.by(sortBy).descending();
+        PageRequest pageRequest = PageRequest.of(pageNo,pageSize, sort);
+        Page<Post> posts = repo.findAll(pageRequest);
+        List<Post> postList = posts.getContent();
+        List<PostDTO> postDTOList = postList.stream().map(post -> mapper.convertValue(post, PostDTO.class))
                 .collect(Collectors.toList());
+        PostResponse postResponse = new PostResponse();
+        postResponse.setContent(postDTOList);
+        postResponse.setPageNo(posts.getNumber());
+        postResponse.setPageSize(posts.getSize());
+        postResponse.setTotalPages(posts.getTotalPages());
+        postResponse.setTotalElements(posts.getTotalElements());
+        postResponse.setLast(posts.isLast());
+        return postResponse;
     }
 
     @Override
