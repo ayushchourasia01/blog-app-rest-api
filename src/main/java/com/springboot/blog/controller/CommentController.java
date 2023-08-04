@@ -2,10 +2,12 @@ package com.springboot.blog.controller;
 
 import com.springboot.blog.dto.CommentDTO;
 import com.springboot.blog.dto.PostDTO;
+import com.springboot.blog.dto.UpdateGroups;
 import com.springboot.blog.service.CommentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,7 +18,7 @@ import java.util.List;
 public class CommentController {
     private final CommentService commentService;
     @PostMapping("/{postId}/comments")
-    ResponseEntity<CommentDTO> addComment(@PathVariable Long postId, @RequestBody CommentDTO commentDTO){
+    ResponseEntity<CommentDTO> addComment(@PathVariable Long postId,@Validated(UpdateGroups.ValidateAll.class) @RequestBody CommentDTO commentDTO){
         return new ResponseEntity<>(commentService.addComment(postId,commentDTO), HttpStatus.CREATED);
     }
     @GetMapping("/{postId}/comments")
@@ -30,7 +32,7 @@ public class CommentController {
     @PutMapping("/{postId}/comments/{id}")
     ResponseEntity<CommentDTO> updatePostById(@PathVariable Long postId,
                                            @PathVariable("id") Long commentId,
-                                           @RequestBody CommentDTO commentDTO){
+                                           @Validated(UpdateGroups.ValidatePartial.class) @RequestBody CommentDTO commentDTO){
         return ResponseEntity.ok(commentService.updateCommentById(postId,commentId,commentDTO));
     }
     @DeleteMapping("/{postId}/comments/{id}")

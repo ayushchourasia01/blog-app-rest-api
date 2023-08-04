@@ -2,14 +2,16 @@ package com.springboot.blog.controller;
 
 import com.springboot.blog.dto.PostDTO;
 import com.springboot.blog.dto.PostResponse;
+import com.springboot.blog.dto.UpdateGroups;
 import com.springboot.blog.service.PostService;
 import com.springboot.blog.utils.ConstantUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/api/posts")
@@ -18,7 +20,7 @@ public class PostController {
     private final PostService postService;
 
     @PostMapping("")
-    ResponseEntity<PostDTO> createPost(@RequestBody PostDTO postDTO){
+    ResponseEntity<PostDTO> createPost( @Validated(UpdateGroups.ValidateAll.class) @RequestBody PostDTO postDTO){
         return new ResponseEntity<>(postService.createPost(postDTO), HttpStatus.CREATED);
     }
     @GetMapping("")
@@ -35,7 +37,7 @@ public class PostController {
         return ResponseEntity.ok(postService.getPostById(postId));
     }
     @PutMapping("/{id}")
-    ResponseEntity<PostDTO> updatePostById(@PathVariable("id") Long postId, @RequestBody PostDTO postDTO){
+    ResponseEntity<PostDTO> updatePostById(@PathVariable("id") Long postId,@Validated(UpdateGroups.ValidatePartial.class) @RequestBody PostDTO postDTO){
         return ResponseEntity.ok(postService.updatePostById(postId,postDTO));
     }
     @DeleteMapping("/{id}")
