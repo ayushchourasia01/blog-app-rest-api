@@ -2,6 +2,7 @@ package com.springboot.blog.service;
 
 import com.springboot.blog.dto.PostDTO;
 import com.springboot.blog.dto.PostResponse;
+import com.springboot.blog.model.PostDAO;
 
 import java.util.List;
 
