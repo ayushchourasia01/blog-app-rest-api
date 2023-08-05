@@ -8,6 +8,7 @@ import com.springboot.blog.utils.ConstantUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,6 +20,7 @@ import javax.validation.Valid;
 public class PostController {
     private final PostService postService;
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("")
     ResponseEntity<PostDTO> createPost( @Validated(UpdateGroups.ValidateAll.class) @RequestBody PostDTO postDTO){
         return new ResponseEntity<>(postService.createPost(postDTO), HttpStatus.CREATED);
@@ -36,10 +38,12 @@ public class PostController {
     ResponseEntity<PostDTO> getPostById(@PathVariable("id") Long postId){
         return ResponseEntity.ok(postService.getPostById(postId));
     }
+    @PreAuthorize("hasRole('ADMIN') || hasRole('USER')")
     @PutMapping("/{id}")
     ResponseEntity<PostDTO> updatePostById(@PathVariable("id") Long postId,@Validated(UpdateGroups.ValidatePartial.class) @RequestBody PostDTO postDTO){
         return ResponseEntity.ok(postService.updatePostById(postId,postDTO));
     }
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     ResponseEntity<String> deletePostById(@PathVariable("id") Long postId){
         postService.deleteById(postId);
