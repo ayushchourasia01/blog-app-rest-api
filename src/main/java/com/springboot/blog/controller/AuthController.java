@@ -1,12 +1,14 @@
 package com.springboot.blog.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.springboot.blog.dto.JWTAuthResponse;
 import com.springboot.blog.dto.LoginDTO;
 import com.springboot.blog.dto.SignupDTO;
 import com.springboot.blog.model.Role;
 import com.springboot.blog.model.User;
 import com.springboot.blog.repository.RoleRepository;
 import com.springboot.blog.repository.UserRepository;
+import com.springboot.blog.security.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,13 +37,18 @@ public class AuthController {
     private PasswordEncoder passwordEncoder;
     @Autowired
     private ObjectMapper mapper;
+    @Autowired
+    private JwtTokenProvider jwtTokenProvider;
 
     @PostMapping("/login")
-    ResponseEntity<String> authenticateUser(@RequestBody LoginDTO loginDTO){
+    ResponseEntity<JWTAuthResponse> authenticateUser(@RequestBody LoginDTO loginDTO){
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                 loginDTO.getUsernameOrEmail(),loginDTO.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        return ResponseEntity.ok("Login Successful");
+        String token = jwtTokenProvider.generateJwtToken(authentication);
+        JWTAuthResponse tokenProvider = new JWTAuthResponse();
+        tokenProvider.setAccessToken(token);
+        return ResponseEntity.ok(tokenProvider);
     }
 
     @PostMapping("/signup")
