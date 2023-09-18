@@ -3,6 +3,8 @@ package com.springboot.blog.config;
 import com.springboot.blog.security.CustomUserDetailsService;
 import com.springboot.blog.security.JwtAuthenticationEntryPoint;
 import com.springboot.blog.security.JwtAuthenticationFilter;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
+import io.swagger.v3.oas.annotations.security.SecurityScheme;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,7 +28,12 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true)
+@SecurityScheme(
+        name = "Bear Authentication",
+        type = SecuritySchemeType.HTTP,
+        bearerFormat = "JWT",
+        scheme = "bearer"
+)
 public class SecurityConfig{
     @Autowired
     private CustomUserDetailsService userDetailsService;
@@ -45,6 +52,8 @@ public class SecurityConfig{
                 .authorizeHttpRequests((authorize) ->
                     authorize.requestMatchers(HttpMethod.GET, "/api/**").permitAll()
                             .requestMatchers("/api/auth/**").permitAll()
+                            .requestMatchers("/api/swagger-ui/**").permitAll()
+                            .requestMatchers("/api/api-docs/**").permitAll()
                             .anyRequest().authenticated())
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(authenticationEntryPoint))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));

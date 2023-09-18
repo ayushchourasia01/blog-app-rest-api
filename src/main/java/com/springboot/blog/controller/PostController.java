@@ -5,6 +5,7 @@ import com.springboot.blog.dto.PostResponse;
 import com.springboot.blog.dto.UpdateGroups;
 import com.springboot.blog.service.PostService;
 import com.springboot.blog.utils.ConstantUtil;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +20,9 @@ import jakarta.validation.Valid;
 @RequiredArgsConstructor
 public class PostController {
     private final PostService postService;
-
+    @SecurityRequirement(
+            name = "Bear Authentication"
+    )
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("")
     ResponseEntity<PostDTO> createPost( @Validated(UpdateGroups.ValidateAll.class) @RequestBody PostDTO postDTO){
@@ -38,11 +41,17 @@ public class PostController {
     ResponseEntity<PostDTO> getPostById(@PathVariable("id") Long postId){
         return ResponseEntity.ok(postService.getPostById(postId));
     }
+    @SecurityRequirement(
+            name = "Bear Authentication"
+    )
     @PreAuthorize("hasRole('ADMIN') || hasRole('USER')")
     @PutMapping("/{id}")
     ResponseEntity<PostDTO> updatePostById(@PathVariable("id") Long postId,@Validated(UpdateGroups.ValidatePartial.class) @RequestBody PostDTO postDTO){
         return ResponseEntity.ok(postService.updatePostById(postId,postDTO));
     }
+    @SecurityRequirement(
+            name = "Bear Authentication"
+    )
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     ResponseEntity<String> deletePostById(@PathVariable("id") Long postId){
